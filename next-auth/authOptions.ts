@@ -11,20 +11,25 @@ export const authOptions: NextAuthOptions = {
                 password: { label: 'Password', type: 'password', placeholder: 'Enter Your Password' }
             },
             async authorize(credentials) {
-                const response = await fetch(`${process.env.API}auth/signin`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        email: credentials?.email,
-                        password: credentials?.password
-                    }),
-                    headers: { 'Content-Type': 'application/json' },
-                });
+              console.log("API VALUE:", process.env.API);
 
-                if (!response.ok) {
-                    throw new Error(response.statusText);
-                }
+const response = await fetch(`${process.env.API}auth/signin`, {
+    method: 'POST',
+    body: JSON.stringify({
+        email: credentials?.email,
+        password: credentials?.password
+    }),
+    headers: { 'Content-Type': 'application/json' },
+});
 
-                const payload = await response.json();
+const text = await response.text();
+console.log("LOGIN RESPONSE:", response.status, text);
+
+if (!response.ok) {
+    throw new Error(text || response.statusText);
+}
+
+const payload = JSON.parse(text);
                 const userData: { id: string } = jwtDecode(payload.token);
 
                 return {
